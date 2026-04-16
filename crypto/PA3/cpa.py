@@ -82,7 +82,7 @@ class cpa:
         ciphertext = b"".join(ciphertext_blocks)
         return f"{r:02x}", ciphertext.hex()
 
-    def decrypt(self, key_hex: str, r_hex: str, ciphertext_hex: str) -> str:
+    def decrypt(self, key_hex: str, r_hex: str, ciphertext_hex: str, strict_padding: bool = True) -> str:
         """Dec(k, r, c) -> m."""
         if r_hex is None or ciphertext_hex is None:
             raise ValueError("r and ciphertext must not be None")
@@ -101,8 +101,17 @@ class cpa:
             plain_blocks.append(Helpers.xor_bytes(block, pad_block))
 
         padded_plaintext = b"".join(plain_blocks)
-        plaintext = Helpers.remove_padding(padded_plaintext, self.block_size)
-        return plaintext.decode("utf-8")
+        
+        if strict_padding:
+            plaintext = Helpers.remove_padding(padded_plaintext, self.block_size)
+            return plaintext.decode("utf-8")
+        else:
+            try:
+                plaintext = Helpers.remove_padding(padded_plaintext, self.block_size)
+                return plaintext.decode("utf-8", errors="replace")
+            except ValueError:
+                # Malleability demo: padding was corrupted, return the raw padded bytes
+                return padded_plaintext.decode("utf-8", errors="replace")
 
     def simulate_ind_cpa_game(
         self,
