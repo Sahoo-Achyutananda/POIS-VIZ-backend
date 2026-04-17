@@ -6,6 +6,7 @@ from crypto.pa9_birthday import (
     run_trials,
     toy_hash,
 )
+from crypto.pa9_history import naive_birthday_attack_history
 import math
 
 router = APIRouter(prefix="/pa9", tags=["PA9"])
@@ -35,6 +36,22 @@ async def run_attack(req: AttackRequest):
             return floyd_birthday_attack(req.n_bits)
         else:
             return naive_birthday_attack(req.n_bits)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/attack-history")
+async def run_attack_history(req: AttackRequest):
+    """
+    Run one birthday attack and return the full step-by-step history.
+    """
+    valid_bits = {8, 10, 12, 14, 16}
+    if req.n_bits not in valid_bits:
+        raise HTTPException(status_code=422, detail=f"n_bits must be one of {valid_bits}")
+
+    try:
+        # History is only supported for naive mode in the player for now
+        return naive_birthday_attack_history(req.n_bits)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

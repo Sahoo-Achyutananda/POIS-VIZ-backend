@@ -11,6 +11,7 @@ from routes.pa6 import router as pa6_router
 from routes.pa7 import router as pa7_router
 from routes.pa8 import router as pa8_router
 from routes.pa9 import router as pa9_router
+from routes.pa10 import router as pa10_router
 
 
 app = FastAPI(title="Minicrypt PA1 Backend")
@@ -44,3 +45,4 @@ app.include_router(pa6_router, prefix="/api", tags=["PA6"])
 app.include_router(pa7_router, prefix="/api", tags=["PA7"])
 app.include_router(pa8_router, prefix="/api", tags=["PA8"])
 app.include_router(pa9_router, prefix="/api", tags=["PA9"])
+app.include_router(pa10_router, prefix="/api", tags=["PA10"])
